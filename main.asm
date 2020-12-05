@@ -5,7 +5,7 @@ include macro.inc
 
 .data
 	
-	; 165 is the lowest value at which mario touches the ground
+	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db 20
 	mario_Y db 165
 	
@@ -19,7 +19,7 @@ include macro.inc
 	
 
 	; BX for Row(Y axis). AX for collumn(x axis)  
-	;Dont touch anything. It works perfectly fine. Thanks
+	;Please Dont touch anything here. I cant go through the tourture of fixing this
 	marioGen proc
 	
 		mov ax, 0
