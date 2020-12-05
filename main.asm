@@ -13,6 +13,7 @@ include macro.inc
 	mov ax, 0
 	jmp main
 	
+	;Clears the screen. I think we will have to call this function in a loop along with printGameScreen. Otherwise movement will not happen. Also We need another function to draw mario
 	clearScreen proc
 	
 		push ax
