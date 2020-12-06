@@ -275,6 +275,7 @@ include macro.inc
 		;	left_x, left_y, len x, len y, color
 		;mPrintRectangle 65,170, 15, 30, 0Eh	
 		
+		mPrintRectangle 60,60, 20, 20, 0Eh 		;hurdle 1
 		
 		mPrintRectangle 65,170, 15, 30, 0Eh		;Hurdle 2
 		
@@ -283,9 +284,7 @@ include macro.inc
 		
 		mPrintRectangle 315,10, 5, 190, 0Eh		;Flag Pole
 		
-		;mPrintRectangle 315,10, 5, 190, 0Ah
-		
-		;mPrintRectangle 235,10, 80, 40, 0AH
+
 		call drawFlag
 		
 		ret
@@ -299,7 +298,8 @@ include macro.inc
 	
 		mPrintRectangle 235,10, 80, 40, 0AH
 		
-		mPrintPixelinRow
+		;Have to draw a moon/ Star / Special char here
+		;mPrintPixelinRow
 		
 		pop bx
 		pop ax
@@ -315,9 +315,9 @@ include macro.inc
 		push cx
 		push dx
 
-		mov cx,650
+		mov cx,500
 		mydelay:
-		mov bx,650      ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+		mov bx,450      ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
 		mydelay1:
 		dec bx
 		jnz mydelay1
@@ -336,11 +336,9 @@ include macro.inc
 
 
 	main proc
+		call clearScreen
 	
 		back:
-	
-			call clearScreen
-			
 			mov al, mario_X
 			add al, 5
 			
@@ -356,9 +354,10 @@ include macro.inc
 			int 10h
 
 			call printGameScreenReal
-			mPrintRectangle 60,60, 20, 20, 0Eh
+			call clearScreen
 		
-		;jmp back Starts an infinite loop. Uncomment this to see movement :D. 
+		jmp back 
+		;^^^^^^^^^Starts an infinite loop. Uncomment this to see movement :D. 
 		
 	main endp
 	
