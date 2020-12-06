@@ -1,4 +1,5 @@
 include macro.inc
+
 .model small
 .386
 .stack 0100h
@@ -21,6 +22,11 @@ include macro.inc
 	; BX for Row(Y axis). AX for collumn(x axis)  
 	;Please Dont touch anything here. I cant go through the tourture of fixing this
 	marioGen proc
+	
+		push ax
+		push bx
+		push cx
+		push dx
 	
 		mov ax, 0
 		mov al, mario_X
@@ -180,22 +186,34 @@ include macro.inc
 			inc bx
 			
 		loop marioGen_L9
+		
+		pop dx
+		pop cx
+		pop bx
+		pop ax
+		
 		ret
 	marioGen endp
 	
-	;Clears the screen. I think we will have to call this function in a loop along with printGameScreen. Otherwise movement will not happen. Also We need another function to draw mario
-
+	
 	clearScreen proc
 	
-		push ax
+		call delay
 		
-		mov ax, 03h
-		int 10h
+		push ax
+	;	mov ax, 03h
+	;	int 10h
+		
+		mov ah, 00h
+		mov al, 13h
+		int 10h	
+		
 		
 		pop ax
 		ret
 	clearScreen endp
 	
+	;Probabaly will have to remove and redo this function
 	printGameScreen proc
 	
 	
@@ -253,52 +271,94 @@ include macro.inc
 		ret
 	printGameScreen endp
 	
+	printGameScreenReal proc
+		;	left_x, left_y, len x, len y, color
+		;mPrintRectangle 65,170, 15, 30, 0Eh	
+		
+		
+		mPrintRectangle 65,170, 15, 30, 0Eh		;Hurdle 2
+		
+		mPrintRectangle 220,145, 15, 55, 0Eh	;Hurdle 3
+		
+		
+		mPrintRectangle 315,10, 5, 190, 0Eh		;Flag Pole
+		
+		;mPrintRectangle 315,10, 5, 190, 0Ah
+		
+		;mPrintRectangle 235,10, 80, 40, 0AH
+		call drawFlag
+		
+		ret
+	printGameScreenReal endp
+	
+	
+	drawFlag proc
+	
+		push ax
+		push bx
+	
+		mPrintRectangle 235,10, 80, 40, 0AH
+		
+		mPrintPixelinRow
+		
+		pop bx
+		pop ax
+	
+	drawFlag endp
+	
+	
+	delay proc
+
+
+		push ax
+		push bx
+		push cx
+		push dx
+
+		mov cx,650
+		mydelay:
+		mov bx,650      ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+		mydelay1:
+		dec bx
+		jnz mydelay1
+		loop mydelay
+
+
+		pop dx
+		pop cx
+		pop bx
+		pop ax
+
+		ret
+	delay endp
+	
 	
 
 
 	main proc
 	
-		mov ah, 00h
-		mov al, 13h
-		int 10h
-		
-		call marioGen
-		
-
+		back:
 	
-	;	mov ah, 0ch
-	;	mov al, 0Eh
-	;	mov bh, 00h
-	;	mov cx, 10
-	;	mov dx, 30
-	;	int 10h
-		
-		
-		
+			call clearScreen
+			
+			mov al, mario_X
+			add al, 5
+			
+			mov mario_X, al
+			
+			call marioGen
+			
+			mov ah, 09h
+			mov al, 'B'
+			mov bh, 0
+			mov bl, 0Eh
+			mov cx, 2
+			int 10h
 
-		;mPrintPixelinRow 25,25,210, 0Eh
-
-		;	L1_mario:
-		;	
-		;		mPrintPixelinRow 25, 25, 16
-		;	
-		;	loop L1_mario
-			;mPrintPixelinRow 11,35,80
-
-
+			call printGameScreenReal
+			mPrintRectangle 60,60, 20, 20, 0Eh
 		
-		
-		;call printGameScreen
-		
-		;call printGameScreen
-		
-		;	mov ah, 0ch
-		;	mov al, 04h
-		;	mov cx, 5
-		;	mov dx, 5
-		;	int 10h
-		
-
+		;jmp back Starts an infinite loop. Uncomment this to see movement :D. 
 		
 	main endp
 	
