@@ -7,8 +7,8 @@ include macro.inc
 .data
 	
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
-	mario_X db 20
-	mario_Y db 165
+	mario_X db 120
+	mario_Y db 50
 	
 	
 .code
@@ -27,6 +27,8 @@ include macro.inc
 		push bx
 		push cx
 		push dx
+		
+		
 	
 		mov ax, 0
 		mov al, mario_X
@@ -35,28 +37,28 @@ include macro.inc
 		mov bx, 0
 		mov bl, mario_Y
 		
-		mPrintPixelinRow bx,ax,8,4
+		mPrintPixelinRow bx,ax,7,4
 		inc bx
-		mPrintPixelinRow bx,ax,8,4
+		mPrintPixelinRow bx,ax,7,4
 		
 		inc bx
 		mov ax, 0
 		mov al, mario_X
 		sub al, 7			; moving ax back to hat position
 		
-		mPrintPixelinRow bx,ax,16,4	; HAT is 16 cols
+		mPrintPixelinRow bx,ax,15,4	; HAT is 16 cols
 		inc bx
-		mPrintPixelinRow bx,ax,16,4
+		mPrintPixelinRow bx,ax,15,4
 		inc bx
-		mPrintPixelinRow bx,ax,16,4
+		mPrintPixelinRow bx,ax,15,4
 		inc bx
 
 		push bx
 		
-		mov cx, 10
+		mov cx, 9
 		marioGen_L1:
 		
-			mPrintPixelinRow bx,ax,12,6
+			mPrintPixelinRow bx,ax,11,6
 			inc bx
 		
 		loop marioGen_L1
@@ -66,7 +68,9 @@ include macro.inc
 		add ax, 11
 		mov cx, 3
 		push dx
-		mov dx, 3
+		mov dx, 2
+		
+		;sub dx, 2
 		
 		marioGen_L2:
 			mPrintPixelinRow bx,ax,dx,6
@@ -82,14 +86,14 @@ include macro.inc
 		push ax
 		push bx
 		
-		mov cx, 3
+		mov cx, 2
 		
 		mov ax, 0
 		mov al, mario_X
 		sub ax, 1
 		
 		marioGen_L3:
-			mPrintPixelinRow bx,ax,4,2		;Generating Eyes
+			mPrintPixelinRow bx,ax,3,2		;Generating Eyes
 			inc bx
 		loop marioGen_L3
 		
@@ -98,56 +102,56 @@ include macro.inc
 		pop dx
 		add bx, 10
 		
-		mov cx, 10
+		mov cx, 8	;fff
 		
 		marioGen_L4:
-			mPrintPixelinRow bx,ax,13,4
+			mPrintPixelinRow bx,ax,12,4
 			inc bx
 		loop marioGen_L4
 		 ; Add arms here
 		 
-		 mov cx, 3
+		 mov cx, 2
 		 sub ax, 2
 		
 		marioGen_L5:
 		
 			push ax
-			mPrintPixelinRow bx,ax,6,4
+			mPrintPixelinRow bx,ax,3,4
 			
-			add ax, 11
+			add ax, 12
 			
-			mPrintPixelinRow bx,ax,6,4
+			mPrintPixelinRow bx,ax,3,4
 			pop ax
 			inc bx
 			
 		loop marioGen_L5
 		
 		sub ax, 2
-		mov cx, 4
+		mov cx, 3
 		marioGen_L6:
 			
 			push ax
-			mPrintPixelinRow bx,ax,6,2
+			mPrintPixelinRow bx,ax,4,2
 			
-			add ax, 16
+			add ax, 15
 			
-			mPrintPixelinRow bx,ax,6,2
+			mPrintPixelinRow bx,ax,4,2
 			pop ax
 			inc bx
 
 		loop marioGen_L6
 		
 		sub ax, 2
-		mov cx, 4
-		
+		mov cx, 3
+		;Boots
 		marioGen_L7:
 		
 			push ax
-			mPrintPixelinRow bx,ax,6,2
+			mPrintPixelinRow bx,ax,4,2
 			
-			add ax, 20
+			add ax, 19
 			
-			mPrintPixelinRow bx,ax,6,2
+			mPrintPixelinRow bx,ax,4,2
 			pop ax
 			inc bx
 		
@@ -160,28 +164,29 @@ include macro.inc
 		mov al, mario_X
 		mov bl, mario_Y
 		
-		sub ax, 14
+		sub ax, 11
 		add bl, 16
-		mov cx, 3
-		
+		mov cx, 2
+		;Shoulders
 		marioGen_L8:
 		
 			push ax
-			mPrintPixelinRow bx,ax,8, 4
-			add ax, 20
-			mPrintPixelinRow bx,ax,8, 4
+			mPrintPixelinRow bx,ax,4, 4
+			add ax, 16
+			mPrintPixelinRow bx,ax,4, 4
 			pop ax
 			inc bx
+			
 		loop marioGen_L8
 		
-		mov cx, 6
-		
+		mov cx, 5
+		;Arms
 		marioGen_L9:
 		
 			push ax
-			mPrintPixelinRow bx,ax,6, 6
-			add ax, 21
-			mPrintPixelinRow bx,ax,7, 6
+			mPrintPixelinRow bx,ax,3, 6
+			add ax, 17
+			mPrintPixelinRow bx,ax,3, 6
 			pop ax
 			inc bx
 			
@@ -354,9 +359,9 @@ include macro.inc
 			int 10h
 
 			call printGameScreenReal
-			call clearScreen
+			;call clearScreen
 		
-		jmp back 
+		;jmp back 
 		;^^^^^^^^^Starts an infinite loop. Uncomment this to see movement :D. 
 		
 	main endp
