@@ -9,7 +9,7 @@ include macro.inc
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db 120
 	mario_Y db 50
-	
+	;To Do
 	
 .code
 
