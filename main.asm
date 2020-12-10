@@ -25,6 +25,7 @@ include macro.inc
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db 120
 	mario_Y db 50
+
 	
 	current_Level db 0  
 	;Level 0 means Game paused and At start menu.
@@ -33,6 +34,7 @@ include macro.inc
 	;Level 3 means current Level is 3
 	
 	
+
 	
 .code
 
