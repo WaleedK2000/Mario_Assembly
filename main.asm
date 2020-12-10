@@ -245,6 +245,8 @@ include macro.inc
 	;Code first checks which level the game is in. Then checks for keypress
 	readKeystroke proc
 	
+		;Reccord KEYSTROKE from USER here. PLS DONT HAVE MORE THEN ONE.
+	
 		.if(current_Level == 0)
 		
 			;Keypress conditions for level 0
