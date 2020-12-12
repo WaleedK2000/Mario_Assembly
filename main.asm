@@ -244,24 +244,161 @@ include macro.inc
 	;Please implement the keyboard methords here. Ideally you want to follow the template.
 	;Code first checks which level the game is in. Then checks for keypress
 	readKeystroke proc
-	
+		push ax
+		push bx
+		push cx
+		push dx
 		;Reccord KEYSTROKE from USER here. PLS DONT HAVE MORE THEN ONE.
-	
-		.if(current_Level == 0)
 		
-			;Keypress conditions for level 0
+		xor ax, ax
+		
+		mov ah,01h
+		int 16h
+		
+	jz NO_IN
+		
+		mov ah,00h
+		int 16h
+		
+		.if(current_Level == 0)
+		COMMENT @
+			;Keypress conditions for level 0		
+
+				cmp ah,48h
+				je u
+				cmp ah,4Bh
+				je l
+				cmp ah,4Dh
+				je r
+				cmp ah,50h
+				je d
+
+
+				l:
+					mov al,mario_X
+					sub al,5
+					mov mario_X,al
+					jmp exit
+
+				r:
+					mov al,mario_X
+					add al,5
+					mov mario_X,al
 			
+					jmp exit
+
+				u:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit
+
+				d:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit
+				 
+				 exit:
+
+			@
 		.elseif (current_Level == 1)
 		
 			;Keypress conditions for level 1
+			
+			
+			cmp ah,48h
+				je u2
+				cmp ah,4Bh
+				je l2
+				cmp ah,4Dh
+				je r2
+				cmp ah,50h
+				je d2
+
+
+				l2:
+					mov al,mario_X
+					sub al,5
+					mov mario_X,al
+					jmp exit2
+
+				r2:
+					mov al,mario_X
+					add al,5
+					mov mario_X,al
+			
+					jmp exit2
+
+				u2:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit2
+
+				d2:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit2
+				 
+				 exit2:
+
+			
 			
 			
 		.else
 		
 			;random
 			
+			
+			cmp ah,48h
+				je u3
+				cmp ah,4Bh
+				je l3
+				cmp ah,4Dh
+				je r3
+				cmp ah,50h
+				je d3
+
+
+				l3:
+					mov al,mario_X
+					sub al,10
+					mov mario_X,al
+					jmp exit3
+
+				r3:
+					mov al,mario_X
+					add al,10
+					mov mario_X,al
+			
+					jmp exit3
+
+				u3:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit3
+
+				d3:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit3
+				 
+				 exit3:
+
 		.endif
+		
+		NO_IN:
+		
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 	
+		ret
 	readKeystroke endp
 	
 
@@ -361,9 +498,9 @@ include macro.inc
 		push cx
 		push dx
 
-		mov cx,210
+		mov cx,250
 		mydelay:
-		mov bx,320      ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+		mov bx,250   ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
 		mydelay1:
 		dec bx
 		jnz mydelay1
@@ -412,29 +549,32 @@ include macro.inc
 		
 		call clearScreen
 		call setPage
+		
 		back:
 			push cx
-			mov al, mario_X
-			add al, 5
+			;mov al, mario_X
+			;add al, 5
 			
-			mov mario_X, al
 			
+			;mov mario_X, al
+			
+			call readKeystroke
 			call marioGen
-			
-			
-		
+
 			call printGameScreen
 			call switchPage
 			
-			mov al, mario_X
-			add al, 2
 			
+			call readKeystroke
+			;mov al, mario_X
+			;add al, 2
+			;call readKeystroke
 			;mov mario_X, al
 			
 			call printGameScreen
 			call switchPage
-
-
+			
+			
 		
 			pop cx
 		loop back	
