@@ -23,9 +23,12 @@ include macro.inc
 	buffer_page db 0
 	
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
-	mario_X db 120
-	mario_Y db 50
-
+	mario_X db  15
+	mario_Y db 163
+	enemy_x db  80
+	enemy_y db  163
+	enemy_x1 db  60
+	enemy_y1 db  63
 	
 	current_Level db 0  
 	;Level 0 means Game paused and At start menu.
@@ -34,7 +37,6 @@ include macro.inc
 	;Level 3 means current Level is 3
 	
 	
-
 	
 .code
 
@@ -244,6 +246,7 @@ include macro.inc
 	;Please implement the keyboard methords here. Ideally you want to follow the template.
 	;Code first checks which level the game is in. Then checks for keypress
 	readKeystroke proc
+
 		push ax
 		push bx
 		push cx
@@ -284,6 +287,7 @@ include macro.inc
 					mov al,mario_X
 					add al,5
 					mov mario_X,al
+
 			
 					jmp exit
 
@@ -304,8 +308,6 @@ include macro.inc
 			@
 		.elseif (current_Level == 1)
 		
-			;Keypress conditions for level 1
-			
 			
 			cmp ah,48h
 				je u2
@@ -343,10 +345,6 @@ include macro.inc
 					jmp exit2
 				 
 				 exit2:
-
-			
-			
-			
 		.else
 		
 			;random
@@ -429,20 +427,24 @@ include macro.inc
 	;All visual features Exclusive to Level One Go here
 	printLevelOne proc
 	
+		mPrintRectangle 0,400, 320, 5, 10111111b 	,buffer_page	;grass
 		
-		
-		;	left_x, left_y, len x, len y, color, buffer_pages
-		;mPrintRectangle 65,170, 15, 30, 0Eh	
+		;left_x, left_y, len x, len y, color, buffer_pages
+		mPrintRectangle 65,170, 15, 30, 0Eh	
 		
 		mPrintRectangle 60,60, 20, 20, 0Eh 	,buffer_page	;hurdle 1
 		
-		mPrintRectangle 65,170, 15, 30, 0Eh, buffer_page		;Hurdle 2
+		mPrintRectangle 65,170, 15, 30, 0Eh, buffer_page		    ;Hurdle 2
+		mPrintRectangle 65,170, 10, 22, 11001110b, buffer_page		;Hurdle 2
+		mPrintRectangle 65,170, 5, 16, 01001010b, buffer_page		;Hurdle 2
 		
-		mPrintRectangle 220,145, 15, 55, 0Eh,buffer_page	;Hurdle 3
+		mPrintRectangle 220,145, 15, 55, 0Eh,buffer_page	   		;Hurdle 3
+		mPrintRectangle 220,145, 10, 45, 11001110b,buffer_page		;Hurdle 3
+		mPrintRectangle 220,145, 5, 40, 01001010b,buffer_page		;Hurdle 3
 		
-		mPrintRectangle 315,10, 5, 190, 0Eh	, buffer_page	;Flag Pole
+		mPrintRectangle 315,10, 5, 190, 10001011b	, buffer_page	;Flag Pole
 		
-
+	    mPrintRectangle 0,400, 320, 5, 10111111b,buffer_page		;grass
 		call drawFlag
 		
 		ret
@@ -452,6 +454,7 @@ include macro.inc
 	;Just a title Screen
 	;Called when VARIABLE current_Level is 0
 	printTitleScreen proc 
+	
 		push ax
 		push bx
 		push cx
@@ -478,21 +481,53 @@ include macro.inc
 	
 		push ax
 		push bx
-	
+	    ;flag
 		mPrintRectangle 235,10, 80, 40, 0AH,buffer_page
-		
 		;Have to draw a moon/ Star / Special char here
+		;star
+		mPrintRectangle 270,23, 11, 11, 63H,buffer_page
+		mPrintRectangle 274,19, 3, 18, 63H,buffer_page      ;vertical
+		mPrintRectangle 266,27, 19, 3, 63H,buffer_page      ;horizontal
+		
 		;mPrintPixelinRow
 		
 		pop bx
 		pop ax
 	
 	drawFlag endp
-	
-	
+	;for level 2
+	enemy proc
+	        ;body
+			mPrintRectangle 135,180, 25, 25,01111101b, buffer_page	
+			;hat
+			mPrintRectangle 140,177, 14, 3, 01001010b, buffer_page	
+			mPrintRectangle 142,175, 10, 2, 01001011b, buffer_page	
+			mPrintRectangle 144,173, 6, 2, 01001011b, buffer_page				
+			;eyebrows
+			mPrintPixelinRow 183,140,4,5	,buffer_page
+			mPrintPixelinRow 183,150,4,5	,buffer_page
+			;eyes
+			mPrintPixelinRow 186,141,2,2	,buffer_page
+			mPrintPixelinRow 186,151,2,2	,buffer_page
+			;lips
+			mPrintPixelinRow 190,145,4,4	,buffer_page
+			mPrintPixelinRow 191,145,4,4	,buffer_page
+			
+	enemy endp
+	;for level 3
+	enemy1 proc
+		;body
+	  	mPrintRectangle 60,60, 20, 20, 85h 	,buffer_page	 
+		mPrintRectangle 62,62, 15, 15,71h ,buffer_page	
+        mPrintRectangle 65,65, 9, 9,66h ,buffer_page
+		;eyes
+		mPrintRectangle 67,66, 2, 2,69h ,buffer_page
+		mPrintRectangle 70,66, 2, 2,69h ,buffer_page
+		;hat
+         mPrintRectangle 65,57, 9, 3, 15h 	,buffer_page	
+		 mPrintRectangle 67,54, 5, 3, 15h 	,buffer_page	
+	enemy1 endp
 	delay proc
-
-
 		push ax
 		push bx
 		push cx
@@ -500,7 +535,9 @@ include macro.inc
 
 		mov cx,250
 		mydelay:
+
 		mov bx,250   ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+
 		mydelay1:
 		dec bx
 		jnz mydelay1
@@ -546,24 +583,26 @@ include macro.inc
 		
 	BPF:	
 		mov cx, 1
-		
+		mov ax,0
 		call clearScreen
 		call setPage
 		
 		back:
 			push cx
+
 			;mov al, mario_X
+
 			;add al, 5
 			
-			
-			;mov mario_X, al
+	
+
 			
 			call readKeystroke
 			call marioGen
 
 			call printGameScreen
 			call switchPage
-			
+
 			
 			call readKeystroke
 			;mov al, mario_X
@@ -572,6 +611,8 @@ include macro.inc
 			;mov mario_X, al
 			
 			call printGameScreen
+			mov ah,0
+			call readKeystroke
 			call switchPage
 			
 			
@@ -587,4 +628,5 @@ include macro.inc
 	
 	mov ah, 4ch
 	int 21h
-	end
+	end 
+
