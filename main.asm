@@ -246,68 +246,157 @@ include macro.inc
 	;Please implement the keyboard methords here. Ideally you want to follow the template.
 	;Code first checks which level the game is in. Then checks for keypress
 	readKeystroke proc
-	
-		.if(current_Level == 0)
+
+		push ax
+		push bx
+		push cx
+		push dx
+		;Reccord KEYSTROKE from USER here. PLS DONT HAVE MORE THEN ONE.
 		
-			;Keypress conditions for level 0
-			mov ah,0
-			int 16h
-			cmp ah,48h   	 ;scan code for up
-			je up
-			cmp ah,4Bh  	 ;scan code for left
-			je left
-			cmp ah,4Dh   	 ; scan code for right
-			je right
-			cmp ah,50h   	 ;scan code for down
-			je down
+		xor ax, ax
+		
+		mov ah,01h
+		int 16h
+		
+	jz NO_IN
+		
+		mov ah,00h
+		int 16h
+		
+		.if(current_Level == 0)
+		COMMENT @
+			;Keypress conditions for level 0		
+
+				cmp ah,48h
+				je u
+				cmp ah,4Bh
+				je l
+				cmp ah,4Dh
+				je r
+				cmp ah,50h
+				je d
+
+
+				l:
+					mov al,mario_X
+					sub al,5
+					mov mario_X,al
+					jmp exit
+
+				r:
+					mov al,mario_X
+					add al,5
+					mov mario_X,al
+
 			
-			left:
-			mov al, mario_X
-			sub al, 5
-			right:
-			mov al, mario_X
-			add al, 5
-			up:		
-			mov al, mario_Y
-			add al, 5
-			down:
-			mov al, mario_Y
-			sub al, 5
-			 
-			
+					jmp exit
+
+				u:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit
+
+				d:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit
+				 
+				 exit:
+
+			@
 		.elseif (current_Level == 1)
 		
-			;Keypress conditions for level 1
-			mov ah,0
-			int 16h
-			cmp ah,48h   	 ;scan code for up
-			je up1
-			cmp ah,4Bh  	 ;scan code for left
-			je left1
-			cmp ah,4Dh   	 ; scan code for right
-			je right1
-			cmp ah,50h   	 ;scan code for down
-			je down1
 			
-			left1:
-			mov al, mario_X
-			sub al, 10
-			right1:
-			mov al, mario_X
-			add al, 10
-			up1:		
-			mov bl, mario_Y
-			add bl, 10
-			down1:
-			mov bl, mario_Y
-			sub bl, 10
-				
+			cmp ah,48h
+				je u2
+				cmp ah,4Bh
+				je l2
+				cmp ah,4Dh
+				je r2
+				cmp ah,50h
+				je d2
+
+
+				l2:
+					mov al,mario_X
+					sub al,5
+					mov mario_X,al
+					jmp exit2
+
+				r2:
+					mov al,mario_X
+					add al,5
+					mov mario_X,al
+			
+					jmp exit2
+
+				u2:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit2
+
+				d2:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit2
+				 
+				 exit2:
 		.else
 		
 			;random
 			
+			
+			cmp ah,48h
+				je u3
+				cmp ah,4Bh
+				je l3
+				cmp ah,4Dh
+				je r3
+				cmp ah,50h
+				je d3
+
+
+				l3:
+					mov al,mario_X
+					sub al,10
+					mov mario_X,al
+					jmp exit3
+
+				r3:
+					mov al,mario_X
+					add al,10
+					mov mario_X,al
+			
+					jmp exit3
+
+				u3:
+					mov al,mario_Y
+					add al,10
+					mov mario_Y,al
+					jmp exit3
+
+				d3:
+					mov al,mario_Y
+					sub al,10
+					mov mario_Y,al
+					jmp exit3
+				 
+				 exit3:
+
 		.endif
+		
+		NO_IN:
+		
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 	
+		ret
 	readKeystroke endp
 	
 
@@ -338,12 +427,12 @@ include macro.inc
 	;All visual features Exclusive to Level One Go here
 	printLevelOne proc
 	
-	;	mPrintRectangle 0,400, 320, 5, 10111111b 	,buffer_page	;grass
+		mPrintRectangle 0,400, 320, 5, 10111111b 	,buffer_page	;grass
 		
-		;	left_x, left_y, len x, len y, color, buffer_pages
-		;mPrintRectangle 65,170, 15, 30, 0Eh	
+		;left_x, left_y, len x, len y, color, buffer_pages
+		mPrintRectangle 65,170, 15, 30, 0Eh	
 		
-		;mPrintRectangle 60,60, 20, 20, 0Eh 	,buffer_page	;hurdle 1
+		mPrintRectangle 60,60, 20, 20, 0Eh 	,buffer_page	;hurdle 1
 		
 		mPrintRectangle 65,170, 15, 30, 0Eh, buffer_page		    ;Hurdle 2
 		mPrintRectangle 65,170, 10, 22, 11001110b, buffer_page		;Hurdle 2
@@ -365,6 +454,7 @@ include macro.inc
 	;Just a title Screen
 	;Called when VARIABLE current_Level is 0
 	printTitleScreen proc 
+	
 		push ax
 		push bx
 		push cx
@@ -443,9 +533,11 @@ include macro.inc
 		push cx
 		push dx
 
-		mov cx,210
+		mov cx,250
 		mydelay:
-		mov bx,220      ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+
+		mov bx,250   ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
+
 		mydelay1:
 		dec bx
 		jnz mydelay1
@@ -494,34 +586,36 @@ include macro.inc
 		mov ax,0
 		call clearScreen
 		call setPage
+		
 		back:
 			push cx
-			mov al, mario_X
+
+			;mov al, mario_X
+
 			;add al, 5
 			
-			mov mario_X, al
+	
+
 			
+			call readKeystroke
 			call marioGen
-			
-			call enemy
-			call enemy1
-		
+
 			call printGameScreen
 			call switchPage
+
 			
-			mov al, mario_X
-			mov bl,enemy_x
-			mov bh,enemy_x1
-		;	add al, 2
-			
+			call readKeystroke
+			;mov al, mario_X
+			;add al, 2
+			;call readKeystroke
 			;mov mario_X, al
 			
 			call printGameScreen
 			mov ah,0
 			call readKeystroke
 			call switchPage
-
-
+			
+			
 		
 			pop cx
 		loop back	
@@ -535,3 +629,4 @@ include macro.inc
 	mov ah, 4ch
 	int 21h
 	end 
+
