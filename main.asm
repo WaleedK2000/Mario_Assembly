@@ -53,7 +53,7 @@ include macro.inc
 	enemy_x1 db  60
 	enemy_y1 db  63
 	
-	current_Level db 3
+	current_Level db 0
 	;Level 0 means Game paused and At start menu.
 	;Level 1 means Current Level is 1
 	;Level 2 means Current Level is 2
