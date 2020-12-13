@@ -21,7 +21,11 @@ include macro.inc
 	;Generate Pixels on bufferPage to comply with this technique
 	current_page db 4
 	buffer_page db 0
-	
+	;variables for title page
+	count db 0
+	Row_poistion db 0
+	Column_poistion db 0
+	lives db 3
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db  15
 	mario_Y db 163
@@ -453,28 +457,325 @@ include macro.inc
 	;IS called at the start of Game.
 	;Just a title Screen
 	;Called when VARIABLE current_Level is 0
-	printTitleScreen proc 
+printTitleScreen proc 
 	
 		push ax
 		push bx
 		push cx
+	mov al,12
+	mov ah,06
+	int 10h
+;------background---------
+
+	;mov cx,0
+ mov ah,6
+ mov al,0
+ mov bh,66h
+ mov cl,0  ;left
+ mov ch,50 ;up control
+ mov dh,200
+ mov dl,90  ;right control 
+ int 10h 
+
+;-------top side-----------
+
+mov Row_poistion, 8
+mov Column_poistion, 27
+
+mov count,0
+top:
+inc count
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion     ;SET ROW 
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+	
+	
+	
+	mov ah,09h
+	mov al,'-'
+	mov bh,0
+	mov bl,49h
+	mov cx,1
+	int 10h
+	add Column_poistion,1
+	
+	cmp	count,22
+	jbe top
+
+;-------bottom side----------
+
+mov Row_poistion, 15
+mov Column_poistion, 28
+
+mov count,0
+
+bottom:
+	inc count
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion     ;SET ROW 
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'-'
+	mov bh,0
+	mov bl,49h
+	mov cx,1
+	int 10h
+	add Column_poistion,1
+	
+	cmp	count,21
+	jbe bottom
+
+;--------------------------------------
+;-------Name_Display----------
+
+mov Row_poistion, 10
+mov Column_poistion,35
+mov count,0
+
+
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'M'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'A'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'R'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+	
+	mov ah,09h
+	mov al,'I'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'O'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	
+;-------press ----------
+
+mov Row_poistion, 13
+mov Column_poistion,31
+mov count,0
+
+
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'P'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'R'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'E'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+	
+	mov ah,09h
+	mov al,'S'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'S'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	;-------space ----------
+
+mov Row_poistion, 13
+mov Column_poistion,38
+mov count,0
+
+
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'S'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'P'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'A'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+	
+	mov ah,09h
+	mov al,'C'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	MOV AH,2                ;SET CURSOR POSITION                 
+	MOV DH,Row_poistion   ;SET ROW 
+	inc Column_poistion
+	MOV DL,Column_poistion  ;SET COLUMN
+	INT 10H                 ;CALLING BIOS
+
+	mov ah,09h
+	mov al,'E'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
 		
-		mov ah, 09h
-		mov al, 'B'
-		mov bh, 0
-		mov bl, 0Eh
-		mov cx, 2
-		int 10h
 		
 		
-		mov al, 1
-		mov current_Level, al
+		;mov al, 1
+		;mov current_Level, al
 		pop cx
 		pop bx
 		pop ax
 		
 		ret
 	printTitleScreen endp
+	
+	progress proc
+		push ax
+		push bx
+		push cx
+		push dx
+
+	mov ah,09h
+	mov al,'L:'
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	inc bx
+	
+	mov ah,09h
+	mov al,lives
+	mov bh,0
+	mov bl,0Eh
+	mov cx,1
+	int 10h
+	
+	pop dx
+	pop cx
+	pop bx
+	pop ax
+
+	progress endp
 	
 	;This function will draw the flag
 	drawFlag proc
@@ -495,38 +796,89 @@ include macro.inc
 		pop ax
 	
 	drawFlag endp
+	
 	;for level 2
 	enemy proc
+	     push ax
+	push bx
+	mov ax,0
+	mov bx,0
+	mov bl,enemy_y
+	mov al,enemy_x
 	        ;body
-			mPrintRectangle 135,180, 25, 25,01111101b, buffer_page	
-			;hat
-			mPrintRectangle 140,177, 14, 3, 01001010b, buffer_page	
-			mPrintRectangle 142,175, 10, 2, 01001011b, buffer_page	
-			mPrintRectangle 144,173, 6, 2, 01001011b, buffer_page				
-			;eyebrows
-			mPrintPixelinRow 183,140,4,5	,buffer_page
-			mPrintPixelinRow 183,150,4,5	,buffer_page
-			;eyes
-			mPrintPixelinRow 186,141,2,2	,buffer_page
-			mPrintPixelinRow 186,151,2,2	,buffer_page
-			;lips
-			mPrintPixelinRow 190,145,4,4	,buffer_page
-			mPrintPixelinRow 191,145,4,4	,buffer_page
+			mPrintRectangle ax,bx, 25, 20,01111101b, buffer_page	;ax 135 bx 180
 			
+			;hat
+			add ax,5
+			sub bx,3
+			mPrintRectangle 140,177, 14, 3, 01001010b, buffer_page	 ;ax 140  bx 177
+			add ax,2
+			sub bx 2
+			mPrintRectangle 142,175, 10, 2, 01001011b, buffer_page	 ;ax 142  bx 175
+			add ax,2
+			sub bx 2
+			mPrintRectangle 144,173, 6, 2, 01001011b, buffer_page	 ;ax 144  bx 173		
+			
+			;eyebrows
+			add ax,39
+			sub bx 33
+			mPrintPixelinRow 183,140,4,5	,buffer_page			 ;ax 183 bx 140
+			add bx,10
+			mPrintPixelinRow 183,150,4,5	,buffer_page             ;ax183 bx 150
+			
+			;eyes
+			add ax,3
+			sub bx 0
+			mPrintPixelinRow 186,141,2,2	,buffer_page             ;ax 186 bx 141
+			add bx,10
+			mPrintPixelinRow 186,151,2,2	,buffer_page			;ax 186 bx 151
+			
+			;lips
+			add ax,4
+			sub bx,6
+			mPrintPixelinRow 190,145,4,4	,buffer_page			;ax 190 bx 145
+			add ax,1
+			mPrintPixelinRow 191,145,4,4	,buffer_page			;ax 191 bx 145
+		pop bx
+        pop ax		  
 	enemy endp
+	
 	;for level 3
 	enemy1 proc
+				push ax
+	push bx
+	mov ax,0
+	mov bx,0
+	mov bl,enemy_y1
+	mov al,enemy_x1
+	
 		;body
-	  	mPrintRectangle 60,60, 20, 20, 85h 	,buffer_page	 
-		mPrintRectangle 62,62, 15, 15,71h ,buffer_page	
-        mPrintRectangle 65,65, 9, 9,66h ,buffer_page
+	  	mPrintRectangle ax,bx, 20, 20, 85h 	,buffer_page	     ;ax 60 bx 60
+		add ax,2
+		add bx,2
+		mPrintRectangle 62,62, 15, 15,71h ,buffer_page			 ;ax 62 bx 62
+		add ax,3
+		add bx,3
+        mPrintRectangle 65,65, 9, 9,66h ,buffer_page			 ;ax 65 bx 65
+		
 		;eyes
-		mPrintRectangle 67,66, 2, 2,69h ,buffer_page
-		mPrintRectangle 70,66, 2, 2,69h ,buffer_page
+		add ax,2
+		add bx,1
+		mPrintRectangle 67,66, 2, 2,69h ,buffer_page			 ;ax 67 bx 66
+		add ax,3
+		mPrintRectangle 70,66, 2, 2,69h ,buffer_page			 ;ax 70 bx 66
+		
 		;hat
-         mPrintRectangle 65,57, 9, 3, 15h 	,buffer_page	
-		 mPrintRectangle 67,54, 5, 3, 15h 	,buffer_page	
+		sub ax,5
+		sub bx,9
+        mPrintRectangle 65,57, 9, 3, 15h 	,buffer_page		 ;ax 65 bx 57
+		add ax,2
+		sub bx,3
+		mPrintRectangle 67,54, 5, 3, 15h 	,buffer_page		 ;ax 67 bx 54
+		pop bx
+		pop ax
 	enemy1 endp
+	
 	delay proc
 		push ax
 		push bx
@@ -603,7 +955,7 @@ include macro.inc
 			call printGameScreen
 			call switchPage
 
-			
+			call progress
 			call readKeystroke
 			;mov al, mario_X
 			;add al, 2
@@ -629,4 +981,3 @@ include macro.inc
 	mov ah, 4ch
 	int 21h
 	end 
-
