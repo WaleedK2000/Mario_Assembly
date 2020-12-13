@@ -21,10 +21,7 @@ include macro.inc
 	;Generate Pixels on bufferPage to comply with this technique
 	current_page db 4
 	buffer_page db 0
-	;variables for title page
-	count db 0
-	Row_poistion db 0
-	Column_poistion db 0
+	
 	lives db 3
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db  15
