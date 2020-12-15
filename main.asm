@@ -2,32 +2,7 @@
 ;THERES A BUG WHERE MARIO GLITCHES AFTER X_AXIS IS 250
 ; IF CURRENT LEVEL IS -50 GAME WILL EXIT. Pressing E will exit game on ALL LEVELS!
 ;END OF NOTICE
-;ADDED EXIT CONDITION. PRESS E TO Exit ON LEVEL 1. PLANNED TO CHANGE TO ANOTHER KEY?
-;ADDED condition exit based on current_LEVEL
-;Missing Return in function Call FLAG : D
-;Added Flag Movement
-;Clean up on aisle readKeystroke proc
-;Added IF conditions to prevent Mario from Moving Out of Bounds
-;ADDED Functions
-	;Jumper proc
-		;Responsible for smoother jump animation. Uses Variable jump_Maker.
-	;motionControl_Xaxis
-		;Controls Collisons on X axis. USES AL REGISTER TO DETERMINE DIRECTION OF MOVEMENT ON X AXIS
-	;gravitaionalForce
-		;What goes up must come down 
-	
-	;Print hurdle
-		;Function introduced to make code reusable
-	;Reset 
-		;function to reset Mario's position
-	;collisionTrac
-		;Dectects Collision Between Mario and Enemy A (LEVEL TWO ENEMY)
-	;printGameCompleteScreen
-		;Will display a game ending message before the game ends
-		
-;AND A BUNCH MORE I CANT REMEMBER
-		
-;ENEMEY A CAN MOVE!!!!!!!
+
 	
 
 include macro.inc
@@ -45,13 +20,14 @@ include macro.inc
 	; 165 is the lowest value at which mario touches the ground (Bottom of the window)
 	mario_X db  15
 	mario_Y db 163
+
 	
-	enemy_x db  140
+	enemy_x db  135
 	enemy_y db  175
 	enemyVelocity db 5
 	
-	enemy_x1 db  60
-	enemy_y1 db  63
+	enemy_x1 db  200
+	enemy_y1 db  45
 	
 	current_Level db 0
 	;Level 0 means Game paused and At start menu.
@@ -295,10 +271,10 @@ include macro.inc
 		
 		.if( al < mario_X)
 		
-			add al, 40 ;(10 + 20 ) ;RIGHT MOST HIT BOX  (10 is LEFT MOST HITBOX)
+			add al, 45 ;(10 + 20 ) ;RIGHT MOST HIT BOX  (10 is LEFT MOST HITBOX)
 			.if( mario_X < al )
 			
-				.if(  mario_Y > 155 )
+				.if(  mario_Y > 130 )
 				
 					call reset		;YES, COLLISION HATH TAKE PLACE
 				
@@ -316,9 +292,9 @@ include macro.inc
 	moveEnemy proc
 	
 	
-		.if( enemy_x < 85 )	;Right Corner of Hurdle 1
+		.if( enemy_x < 105 )	;Right Corner of Hurdle 1
 			
-				.if( enemy_x > 60 )	; Left Corner of Hurdle 2
+				.if( enemy_x > 80 )	; Left Corner of Hurdle 2
 					;Collision with Hurdle 1. Change Direction
 					
 						mov enemyVelocity, 2
@@ -589,22 +565,29 @@ include macro.inc
 	;Function Introduces Gravity. Also checks if Mario is about to land on a Hurdle. In which case it makes him stand on it
 	gravitaionalForce proc
 	
-		.if(current_level == 3)
-			jmp KE
-		.endif
+
+			.if( mario_X > 29 )
+			
+				.if(mario_X < 43)
+				
+					.if(mario_Y > 130)
+					
+						.if(mario_Y < 145)
+							mov mario_Y, 135
+							mov jump_Maker, 0
+							mov allowDJmp, 1
+						.endif
+					
+					.endif
+				
+				
+				.endif
+			
+			.endif
 		
-		.if( current_level == 2 )
+			.if( mario_X < 105 )	;Right Corner of Hurdle 1
 			
-			
-			jmp KE
-		.endif
-	
-	
-		.if(current_Level == 1)
-			KE:
-			.if( mario_X < 95 )	;Right Corner of Hurdle 1
-			
-				.if( mario_X > 55 )	; Left Corner of Hurdle 2
+				.if( mario_X > 75 )	; Left Corner of Hurdle 2
 					;Collision with Hurdle 1. But now we check Y axis
 					.if(mario_Y > 130)
 						.if(mario_Y < 145)
@@ -622,14 +605,17 @@ include macro.inc
 					.if(mario_Y > 100)
 						.if(mario_Y < 115)
 							mov mario_Y, 105
-							mov jump_Maker, 0
+							
 							mov allowDJmp, 1
 						.endif	
 					.endif
 					
 				.endif
 			.endif	
-		.endif
+		
+		
+	
+		
 	
 		.if( mario_Y > 157 )
 			
@@ -685,14 +671,16 @@ include macro.inc
 		;mPrintRectangle 0,400, 320, 5, 10111111b 	,buffer_page	;grass
 		
 		;left_x, left_y, len x, len y, color, buffer_pages
-		mPrintRectangle 65,170, 15, 30, 0Eh	
+		mPrintRectangle 85,170, 15, 30, 0Eh	
 		;mPrintRectangle 75,170, 5, 30, 0Eh	
 		
-		mPrintRectangle 180,60, 20, 20, 0Eh 	,buffer_page			;hurdle 1 UPPER
+		mPrintRectangle 30,170, 10, 25, 0Eh 	,buffer_page			;hurdle 1 UPPER
 		;mPrintRectangle 60,170, 15, 30, 0Eh, buffer_page		    ;Hurdle 2
 		
-		mPrintRectangle 65,170, 10, 22, 11001110b, buffer_page		;Hurdle 2
-		mPrintRectangle 65,170, 5, 16, 01001010b, buffer_page		;Hurdle 2
+		
+		
+		mPrintRectangle 85,170, 10, 22, 11001110b, buffer_page		;Hurdle 2
+		mPrintRectangle 85,170, 5, 16, 01001010b, buffer_page		;Hurdle 2
 		
 		mPrintRectangle 220,145, 15, 55, 0Eh,buffer_page	   		;Hurdle 3
 		mPrintRectangle 220,145, 10, 45, 11001110b,buffer_page		;Hurdle 3
@@ -864,6 +852,7 @@ include macro.inc
 		
 		mov al, 1
 		mov current_Level, al
+		
 		pop cx
 		pop bx
 		pop ax
@@ -895,15 +884,21 @@ include macro.inc
 		ret
 	drawFlag endp
 	
+		;;ALL VARIABLES ARE WORD SIZED (AX)
+	;;Give coordinate of top Left of the square/Rectangle. Give lenght in X axis direction and lenght in Y axis direction. Give color.
 
 	
 	
-	
 	;for level 2
-	
+
+
 	enemy proc
 			push ax
 			push bx
+			push cx
+			push dx
+			push si
+			
 			mov ax,0
 			mov bx,0
 			mov bl,enemy_y
@@ -922,66 +917,43 @@ include macro.inc
 			sub bx, 2
 			mPrintRectangle ax,bx, 6, 2, 01001011b, buffer_page	 ;ax 144  bx 173		
 			
+			
+			mov si, ax
+			mov dx, bx
+			
+			xchg si, dx
+			
 			;eyebrows
-			add ax,39
-			sub bx, 33
-			;mPrintPixelinRow ax,bx,4,5	,buffer_page			 ;ax 183 bx 140
-			add bx,10
-		;	mPrintPixelinRow ax,bx,4,5	,buffer_page             ;ax183 bx 150
+			mov ax, 0
+			mov al, enemy_y
+			mov si, ax
+			add si, 5
+			sub dx, 3
+			mPrintPixelinRow si,dx,4,5	,buffer_page			 ;ax 183 bx 140
+			add dx,10
+			mPrintPixelinRow si,dx,4,5	,buffer_page             ;ax183 bx 150
 			
 			;eyes
-			add ax,3
-			sub bx, 9
-		;	mPrintPixelinRow ax,bx,2,2	,buffer_page             ;ax 186 bx 141
-			add bx,10
-		;	mPrintPixelinRow ax,bx,2,2	,buffer_page			;ax 186 bx 151
+			add si,3
+			sub dx, 9
+			mPrintPixelinRow si,dx,2,2	,buffer_page             ;ax 186 bx 141
+			add dx,10
+			mPrintPixelinRow si,dx,2,2	,buffer_page			;ax 186 bx 151
 			
 			;lips
-			add ax,4
-			sub bx,6
-		;	mPrintPixelinRow ax,bx,4,4	,buffer_page			;ax 190 bx 145
-			add ax,1
-		;	mPrintPixelinRow ax,bx,4,4	,buffer_page			;ax 191 bx 145
+			add si,4
+			sub dx,6
+			mPrintPixelinRow si,dx,4,4	,buffer_page			;ax 190 bx 145
+			add si,1
+			mPrintPixelinRow si,dx,4,4	,buffer_page			;ax 191 bx 145
+			
+			pop si
+			pop dx
+			pop cx
 			pop bx
 			pop ax
 			ret
 	enemy endp
-	
-	
-	enemyK proc
-		push ax
-		push bx
-	        ;body
-			mov ax, 0
-			mov bx, 0
-			
-			mov al, enemy_x ;135 Stored
-			mov bl, enemy_y ;180 stored
-			
-			;mPrintRectangle 135,180, 25, 25,01111101b, buffer_page	OLD
-			mPrintRectangle ax,bx, 25, 25,01111101b, buffer_page	;ax = 135, bx = 180
-			;hat
-			add ax, 5	;ax = 140
-			sub bx, 3	;bx = 177
-			;mPrintRectangle 140,177, 14, 3, 01001010b, buffer_page	OLD
-			
-			mPrintRectangle ax,bx, 14, 3, 01001010b, buffer_page	;ax = 140, bx = 177
-			
-			mPrintRectangle 142,175, 10, 2, 01001011b, buffer_page	
-			mPrintRectangle 144,173, 6, 2, 01001011b, buffer_page				
-			;eyebrows
-			mPrintPixelinRow 183,140,4,5	,buffer_page
-			mPrintPixelinRow 183,150,4,5	,buffer_page
-			;eyes
-			mPrintPixelinRow 186,141,2,2	,buffer_page
-			mPrintPixelinRow 186,151,2,2	,buffer_page
-			;lips
-			mPrintPixelinRow 190,145,4,4	,buffer_page
-			mPrintPixelinRow 191,145,4,4	,buffer_page
-		pop bx
-		pop ax
-		ret
-	enemyK endp
 	
 	;for level 3
 	enemy11 proc
@@ -1047,7 +1019,7 @@ include macro.inc
 		push cx
 		push dx
 
-		mov cx,150
+		mov cx,15
 		mydelay:
 
 		mov bx,150   ;; increase this number if you want to add more delay, and decrease this number if you want to reduce delay.
@@ -1075,38 +1047,40 @@ include macro.inc
 	; ******* CAUTION **********************
 	motionControl_Xaxis proc 
 	
-		.if(current_level == 3)
-			jmp KE
-		.endif
+		.if( mario_X > 28 )
+		
+			.if( mario_X < 45 )
+			
+				.if(mario_Y > 140)
+					add mario_X, al
+				.endif
+			
+			.endif
+		
+		.endif 
 	
-		.if(current_level == 2)
-			jmp KE
-		.endif
-		.if(current_Level == 1)
-			KE:
-		
-			.if( mario_X < 85 )	;Right Corner of Hurdle 1
+	
+	
+		.if( mario_X < 105 )	;Right Corner of Hurdle 1
 			
-				.if( mario_X > 60 )	; Left Corner of Hurdle 2
-					;Collision with Hurdle 1. But now we check Y axis
-					.if(mario_Y > 140)
-						add mario_X, al
-					.endif
-			
+			.if( mario_X > 80 )	; Left Corner of Hurdle 2
+				;Collision with Hurdle 1. But now we check Y axis
+				.if(mario_Y > 140)
+					add mario_X, al
 				.endif
-			.elseif( mario_X < 240 )   ; RIGHT Corner of Hurdle 2 Ground	
+			
+			.endif
+		.elseif( mario_X < 240 )   ; RIGHT Corner of Hurdle 2 Ground	
 				
-				.if( mario_X > 215  ) ; LEFT Corner
+			.if( mario_X > 215  ) ; LEFT Corner
 					
-					.if(mario_Y > 120)
-						add mario_X, al
-					.endif
-					
+				.if(mario_Y > 120)
+					add mario_X, al
 				.endif
-			.endif	
-		.endif
-		
-		
+				
+			.endif
+		.endif	
+	
 		
 		ret
 	motionControl_Xaxis endp
