@@ -27,13 +27,18 @@ include macro.inc
 	enemyVelocity db 5
 	
 	enemy_x1 db  200
-	enemy_y1 db  45
+	enemy_y1 db  20
+	enemyVelocity1 db 5
+	
+	bullet_y1 db  45
+	bullet_Control db 0	;0 means move, 1 means dont move
 	
 	current_Level db 0
 	;Level 0 means Game paused and At start menu.
 	;Level 1 means Current Level is 1
 	;Level 2 means Current Level is 2
 	;Level 3 means current Level is 3
+	;-100 = Gave over (lives = 0)
 	; 10 means end of 1
 	;20 means end of Level 2
 	;30 means end of level 3 (END OF GAME)
@@ -43,14 +48,33 @@ include macro.inc
 	allowDJmp db 1 ;0 means allow double jump, 1 Means do not allow double jump or JUMP
 	
 	flag_Y db 10
+	
+	lives db 3
 
 	;----------- 200 AT FLOOR OF WINDOW
 	
 	
-	
+	scoreTrack db 00         
 	;STRINGS
+	tTitle db '***~MARIO~***'
 	strTitleScreen1 db 'PRESS ANY KEY TO START'
-	strLEVELONE1 db 'E: Exit'
+	 strexit db 'Exit:E'
+	strprogress1 db 'Level:1'
+	strprogress2 db 'Level:2'
+	strprogress3 db 'Level:3'
+	strLives1 db 'Lives:'
+	strgameo db 'GAME OVER!!!'
+	strgamem db '~YOU WIN~'
+	strl2 db '~LEVEL 2~'
+	strl3 db '~LEVEL 3~'
+	score1 db 'Score:00'   ;these will only display during game to create an ease for displaying score
+	score2 db 'Score:20'
+	score3 db 'Score:50'
+;this is the score we will print after calculating our score
+	scstr  db 'Score:100'
+	byeLose1 db 'Game Over!'
+	byeLose2 db 'Better Luck Next Time'
+
 .code
 
 	mov ax, @data
@@ -60,7 +84,7 @@ include macro.inc
 	
 
 	; BX for Row(Y axis). AX for collumn(x axis)  
-	;Dont Ask
+
 	marioGen proc
 	
 		push ax
@@ -241,7 +265,7 @@ include macro.inc
 	;Used to clear the screen
 	clearScreen proc
 	
-		call delay
+		;call delay
 		
 		push ax
 		mov ah, 00h
@@ -255,6 +279,11 @@ include macro.inc
 	
 	reset proc
 
+		.if(lives < 1)
+			mov current_level, -100 ;Game Over
+		.endif
+
+
 		mov mario_X, 15
 		mov mario_Y, 163
 		mov flag_Y, 10
@@ -263,8 +292,10 @@ include macro.inc
 	reset endp
 	
 	;Incharge of Tracking collisions of Mario with Enemy in LEVEL 2 ONLY
+	; (enemyX1, BulletY)    (enemyX1 + 8, bulletY + 8    )
 	collisionTrac proc
 		push ax
+		
 		mov ax, 0
 		mov al, enemy_x
 		sub al, 10			;LEFT MOST HIT BOX
@@ -274,8 +305,8 @@ include macro.inc
 			add al, 45 ;(10 + 20 ) ;RIGHT MOST HIT BOX  (10 is LEFT MOST HITBOX)
 			.if( mario_X < al )
 			
-				.if(  mario_Y > 130 )
-				
+				.if(  mario_Y > 135 )
+					dec lives
 					call reset		;YES, COLLISION HATH TAKE PLACE
 				
 				.endif
@@ -284,6 +315,7 @@ include macro.inc
 			.endif
 
 		.endif
+		
 		
 		pop ax
 		ret
@@ -316,6 +348,9 @@ include macro.inc
 		add enemy_x, al
 		ret
 	moveEnemy endp
+	
+	
+	
 	
 	;Please implement the keyboard methords here. Ideally you want to follow the template.
 	;Code first checks which level the game is in. Then checks for keypress
@@ -356,7 +391,7 @@ include macro.inc
 				cmp ah,4Dh
 				je move_right
 				cmp ah,50h
-				je move_down
+				;je move_down
 			
 			.endif
 		
@@ -364,109 +399,7 @@ include macro.inc
 		
 		jmp NO_IN
 		
-		.if(current_Level == 0)
-		COMMENT @
-			;Keypress conditions for level 0		
-			;********************************************COMMENTED OUT
-				cmp ah,48h
-				je move_up
-				cmp ah,4Bh
-				je move_left
-				cmp ah,4Dh
-				je move_right
-				cmp ah,50h
-				je move_down
-
-
-				move_left:
-					mov al,mario_X
-					sub al,5
-					mov mario_X,al
-					jmp exit
-
-				move_right:
-					mov al,mario_X
-					add al,5
-					mov mario_X,al
-					jmp exit
-
-				move_down:
-					mov al,mario_Y
-					add al,10
-					mov mario_Y,al
-					jmp exit
-
-				move_up:
-					mov al,mario_Y
-					sub al,10
-					mov mario_Y,al
-					jmp exit
-				 
-				 exit:
-
-			@
-		.elseif (current_Level == 1)
-										;Key Presses For LEVEL 1
-			
-				cmp ah,48h
-				je move_up
-				cmp ah,4Bh
-				je move_left
-				cmp ah,4Dh
-				je move_right
-				cmp ah,50h
-				je move_down
-				
-
-				
-		.elseif ( current_level == 2 )
 		
-				cmp ah,48h
-				je move_up
-				cmp ah,4Bh
-				je move_left
-				cmp ah,4Dh
-				je move_right
-				cmp ah,50h
-				je move_down
-				
-				cmp al, 'e'
-				je BYE
-				
-		.elseif (current_level == 3)
-		
-				cmp ah,48h
-				je move_up
-				cmp ah,4Bh
-				je move_left
-				cmp ah,4Dh
-				je move_right
-				cmp ah,50h
-				je move_down
-				
-				cmp al, 'e'
-				je BYE
-				
-		
-		
-		.else
-										;NOT IMPLEMENTED
-			;random
-			COMMENT @
-			
-			cmp ah,48h
-				je u3
-				cmp ah,4Bh
-				je l3
-				cmp ah,4Dh
-				je r3
-				cmp ah,50h
-				je d3
-
-
-				@
-
-		.endif
 		
 			jmp NO_IN
 				move_left:
@@ -566,9 +499,9 @@ include macro.inc
 	gravitaionalForce proc
 	
 
-			.if( mario_X > 29 )
+			.if( mario_X > 20 )
 			
-				.if(mario_X < 43)
+				.if(mario_X < 55)
 				
 					.if(mario_Y > 130)
 					
@@ -585,7 +518,7 @@ include macro.inc
 			
 			.endif
 		
-			.if( mario_X < 105 )	;Right Corner of Hurdle 1
+			.if( mario_X < 115 )	;Right Corner of Hurdle 1
 			
 				.if( mario_X > 75 )	; Left Corner of Hurdle 2
 					;Collision with Hurdle 1. But now we check Y axis
@@ -600,11 +533,11 @@ include macro.inc
 				.endif
 			.elseif( mario_X < 250 )   ; RIGHT Corner of Hurdle 2 Ground	
 				
-				.if( mario_X > 204  ) ; LEFT Corner
+				.if( mario_X > 205  ) ; LEFT Corner
 					
 					.if(mario_Y > 100)
-						.if(mario_Y < 115)
-							mov mario_Y, 105
+						.if(mario_Y < 130)
+							mov mario_Y, 110
 							
 							mov allowDJmp, 1
 						.endif	
@@ -640,25 +573,39 @@ include macro.inc
 	;Will check which level the user is on and will call a function to  print Screen
 	printGameScreen proc
 	
+		;mdelay 800
+	
 		.if(current_Level == 0)
+		
 			call printTitleScreen
 		.elseif (current_Level == 1)
+		
 			call printLevelOne
+			call marioGen
 		.elseif (current_Level == 10)
 			call printLevelOneEnd
 		.elseif (current_Level == 2)
+		
+			call marioGen
 			call moveEnemy
+			call moveEnemy1
 			call collisionTrac
 			call printLevelTwo
 		.elseif	(current_level == 20)
 			call printLevelTwoEnd
+			
 		.elseif (current_level == 3)
-			call moveEnemy
+			call marioGen
+			call moveEnemy			;COMMENTED FOR DEBUGGING PURPOSE
+			call moveEnemy1
 			call collisionTrac
+			call bulletfun2
 			call printLevelThree
 			
 		.elseif(current_level == 30)
 			call printGameCompleteScreen
+		.elseif(current_level == -100)
+			call printGameOver
 		.else
 			;random
 		.endif
@@ -668,23 +615,23 @@ include macro.inc
 	
 	printHurdles proc
 	
-		;mPrintRectangle 0,400, 320, 5, 10111111b 	,buffer_page	;grass
-		
-		;left_x, left_y, len x, len y, color, buffer_pages
-		mPrintRectangle 85,170, 15, 30, 0Eh	
+		;------left_x, left_y, len x, len y, color, buffer_pages-----
+
 		;mPrintRectangle 75,170, 5, 30, 0Eh	
-		
-		mPrintRectangle 30,170, 10, 25, 0Eh 	,buffer_page			;hurdle 1 UPPER
 		;mPrintRectangle 60,170, 15, 30, 0Eh, buffer_page		    ;Hurdle 2
 		
-		
-		
-		mPrintRectangle 85,170, 10, 22, 11001110b, buffer_page		;Hurdle 2
-		mPrintRectangle 85,170, 5, 16, 01001010b, buffer_page		;Hurdle 2
-		
-		mPrintRectangle 220,145, 15, 55, 0Eh,buffer_page	   		;Hurdle 3
-		mPrintRectangle 220,145, 10, 45, 11001110b,buffer_page		;Hurdle 3
-		mPrintRectangle 220,145, 5, 40, 01001010b,buffer_page		;Hurdle 3
+		;hurdle 1
+		mPrintRectangle 30,170, 11, 25, 0Eh 	,buffer_page
+		mPrintRectangle 30,170, 7, 20, 11001110b 	,buffer_page
+		mPrintRectangle 30,170, 3, 15, 01001010b 	,buffer_page			
+		;;Hurdle 2
+		mPrintRectangle 85,170, 15, 30, 0Eh							
+		mPrintRectangle 85,170, 10, 22, 11001110b, buffer_page		
+		mPrintRectangle 85,170, 5, 16, 01001010b, buffer_page		
+		;hurdle 3
+		mPrintRectangle 220,145, 15, 55, 0Eh,buffer_page	   		
+		mPrintRectangle 220,145, 10, 45, 11001110b,buffer_page		
+		mPrintRectangle 220,145, 5, 40, 01001010b,buffer_page		
 		
 		mPrintRectangle 315,10, 5, 190, 10001011b	, buffer_page	;Flag Pole
 		
@@ -701,12 +648,26 @@ include macro.inc
 	;All visual features Exclusive to Level One Go here
 	
 	printLevelOne proc
-	
-
+		push ax
+		push bx
+		push cx
+		push dx
+		mov si, offset  strexit
+		mWriteStringAtPos 0,0, si, 6 , 0Eh, buffer_page ;Prints Exit: E
+		mov si, offset strLives1
+		mWriteStringAtPos 0,2, si, 6 , 62h, buffer_page ;Prints lives
+		
+		mMoveCursor 6,2,buffer_page
+		mov al, lives
+		add al, 48
+		mWriteCharAtCursor al,62h, buffer_page
+		
+		mov si, offset strprogress1
+		mWriteStringAtPos 0,4, si, 7 , 62h, buffer_page ;Prints level
+		mov si, offset score1
+		mWriteStringAtPos 0,6, si, 7 , 62h, buffer_page ;Prints progress/score
 		call printHurdles
 		
-		mov si, offset strLEVELONE1
-		mWriteStringAtPos 0,0, si, 7 , 0Eh, buffer_page ;Prints Exit: E
 			
 		.if(mario_X > 249)
 				
@@ -716,7 +677,8 @@ include macro.inc
 				call drawFlag
 						
 			.else
-			
+			;calculating our score to displayat the end 
+			    mov scoreTrack,20
 				mov current_Level, 10
 			
 			.endif
@@ -726,28 +688,63 @@ include macro.inc
 			
 			
 		call drawFlag
-		
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 		ret
 	printLevelOne endp
 	
 	
 	printLevelOneEnd proc
-		
-		
+		push ax
+		push bx
+		push cx
+		push dx
+		push si
 		call clearScreen
-		;INSERT MESSAGE HERE USING MACRO AND STRING
+		mPrintRectangle 0,0, 320, 320, 35H,buffer_page
+		;INSERT MESSAGE 
+		; LEVEL 1 COMPLETE
+		mov si, offset strl2
+		mWriteStringAtPos 40,40, si, 9 , 45h, buffer_page 
+		
 		mdelay 1200	;Delay before starting Next Level
 		
 		mov current_Level, 2  ;Start Level 2
 
 		call reset
+		pop si
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 		ret
 	
 	printLevelOneEnd endp
 	
 	
 	printLevelTwo proc
-	
+		push ax
+		push bx
+		push cx
+		push dx
+		mov si, offset strexit
+		mWriteStringAtPos 0,0, si, 6 , 0Eh, buffer_page ;Prints Exit: E
+		mov si, offset strLives1
+		mWriteStringAtPos 0,2, si, 6 , 62h, buffer_page ;Prints lives
+		
+		mMoveCursor 6,2,buffer_page
+		mov al, lives
+		add al, 48
+		mWriteCharAtCursor al,62h, buffer_page
+		
+		
+		mov si, offset strprogress2
+		mWriteStringAtPos 0,4, si, 7 , 62h, buffer_page ;Printslevel
+		mov si, offset score2
+		mWriteStringAtPos 0,6, si, 8 , 62h, buffer_page ;Prints score
+		call PrintCloud
 		call enemy
 		call printHurdles
 		
@@ -761,7 +758,8 @@ include macro.inc
 				call drawFlag
 						
 			.else
-			
+			;calculating our score to displayat the end 
+			    mov scoreTrack,50
 				mov current_Level, 20 ; LEVEL 2 ends
 			
 			.endif
@@ -771,51 +769,83 @@ include macro.inc
 			
 			
 		call drawFlag
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 		ret
 	printLevelTwo endp
 	;Prints the end of Level 2 after flag reaches bottom 
 
 	printLevelTwoEnd proc
-	
+		push ax
+		push bx
+		push cx
+		push dx
 	
 		call clearScreen
-		;INSERT MESSAGE HERE USING MACRO AND STRING
-		;Something like LEVEL X COMPLETE
-		;Figure it out smh
+		mPrintRectangle 0,0, 320, 320, 35H,buffer_page
+		;INSERT MESSAGE 
+		; LEVEL 2 COMPLETE
+		mov si, offset strl3
+		mWriteStringAtPos 40,39, si, 9 , 45h, buffer_page 
+		
 		mdelay 1200	;Delay before starting Next Level
 		
 		mov current_Level, 3  ;Start Level 3
 
 		call reset
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 	
 		ret
 	printLevelTwoEnd endp
 	
 	
 	printLevelThree proc
-	
+		push ax
+		push bx
+		push cx
+		push dx
+		mov si, offset strexit
+		mWriteStringAtPos 0,0, si, 6 , 0Eh, buffer_page ;Prints Exit: E
+		mov si, offset strLives1
+		mWriteStringAtPos 0,2, si, 6 , 62h, buffer_page ;Prints lives
+		mMoveCursor 6,2,buffer_page
+		mov al, lives
+		add al, 48
+		mWriteCharAtCursor al,62h, buffer_page
+		
+		mov si, offset strprogress3
+		
+		mWriteStringAtPos 0,4, si, 7 , 62h, buffer_page ;Prints progress/score
+		mov si, offset score3
+		mWriteStringAtPos 0,6, si, 8 , 62h, buffer_page ;Prints score
+		
+		call kingdom
 		call enemy
 		call printHurdles
 		call enemy1
 		
 		.if(mario_X > 249)
 				
-			.if( flag_Y < 150 )
 			
-				add flag_Y, 2
-				call drawFlag
-						
-			.else
-			
+			  ;calculating our score to displayat the end 
+			    mov scoreTrack, 100
 				mov current_Level, 30 ;Game Ends
 			
-			.endif
+			
 			
 		.endif
 			
 			
-		call drawFlag
-	
+		
+		pop dx
+		pop cx
+		pop bx
+		pop ax
 		
 		ret
 	printLevelThree endp
@@ -823,13 +853,82 @@ include macro.inc
 	
 	printGameCompleteScreen proc
 	
-		; ADD GAME END MESSAGE HERE
+		;push ax
+		;push bx
+		;push cx
+		;push dx
+		
+		mov current_page, 0
+		mov buffer_page, 0
+		call switchPage
+		
+		push si
+		
+	    call clearScreen
+		;end game msg
+		mPrintRectangle 0,0, 320, 320, 35H,current_page
+		;game over msg
+		mov si, offset strgameo
+		mWriteStringAtPos 45,39, si, 12 , 62h, current_page 
+		;you won msg
+		mov si, offset strgamem
+		mWriteStringAtPos 42,41, si, 9, 49h, current_page 
+		;score: msg
+		mov si, offset scstr
+		mWriteStringAtPos 37,40, si,9, 49h, current_page 
+		
+
+		mdelay 2000
+		
+
+	
+
+		
+		
 		mdelay 1200 ;Delay before exiting
 		mov current_LEVEL, -50 ;exit code
-		
+		pop si
+		;pop dx
+		;pop cx
+		;pop bx
+		;pop ax
 		ret
 	
 	printGameCompleteScreen endp
+	
+	printGameOver proc
+	
+		push si
+		
+		mov current_page, 0
+		mov buffer_page, 0
+		call switchPage
+		
+		call clearScreen
+		mPrintRectangle 0,0, 320, 320, 35H,current_page
+		mov si, offset byeLose1
+		mWriteStringAtPos 6,39, si, 10 , 62h, current_page 
+		mov si, offset byeLose2
+		mWriteStringAtPos 0,40, si, 21 , 62h, current_page 
+		
+
+		.if (scoreTrack == 0)
+			mov si, offset score1
+		.elseif ( scoreTrack == 20)
+			mov si, offset score2
+		.else
+			mov si, offset score3
+		.endif
+		
+		mWriteStringAtPos 0,38, si, 8 , 62h, current_page 
+		
+		mdelay 2000
+		mov current_LEVEL, -50 ;exit code
+		pop si
+		ret
+	
+	printGameOver endp
+	
 	
 	;IS called at the start of Game.
 	;Just a title Screen
@@ -839,20 +938,36 @@ include macro.inc
 		push ax
 		push bx
 		push cx
-		
-		mov si, offset strTitleScreen1
-		mWriteStringAtPos 45,45, si, 22 , 0Eh, buffer_page
+		push dx
 	
-	;	mMoveCursor 80,80,buffer_page
+	
+	;------background---------
+		mPrintRectangle 0,0, 320, 320, 68H,buffer_page
+		mPrintRectangle 35,39, 240, 130, 36H,buffer_page
+		mPrintRectangle 55,56, 195, 90, 50H,buffer_page
+ 
+		mov si, offset tTitle
+		mWriteStringAtPos 44,35, si, 13 , 39h, buffer_page
+		mov si, offset strTitleScreen1
+		mWriteStringAtPos 40,40, si, 22 , 39h, buffer_page
+	
+	SOT:
+	
+		mov ah,01h
+		int 16h
 		
-	;	mWriteCharAtCursor 'C', 0AH,buffer_page
-	;	mWriteCharAtCursor 'C', 0AH,buffer_page
+		jz SOT
+	
+
+		;mdelay 2350
 		
-		mdelay 1250
+		;jmp SOT
+	
+		title_bye:
 		
-		mov al, 1
-		mov current_Level, al
+		mov current_level, 1
 		
+		pop dx
 		pop cx
 		pop bx
 		pop ax
@@ -864,6 +979,7 @@ include macro.inc
 	drawFlag proc
 	
 		push ax
+	
 	
 		
 		mov ax, 0
@@ -889,7 +1005,39 @@ include macro.inc
 
 	
 	
-	;for level 2
+	; ************************************************ ENEMIES ******************************************8
+
+
+
+	moveEnemy1 proc
+	
+	
+		.if( enemy_x1 < 105 )	;Right Corner of Hurdle 1
+			
+				.if( enemy_x1 > 80 )	; Left Corner of Hurdle 2
+					;Collision with Hurdle 1. Change Direction
+					
+						mov enemyVelocity1, 2
+
+				.endif
+		.elseif( enemy_x1 < 240 )   ; RIGHT Corner of Hurdle 2 Ground	
+				
+				.if( enemy_x1 > 195  ) ; LEFT Corner
+					
+					
+						mov enemyVelocity1, -2 ;Collison with hurdle 2. Change Direction
+				
+	
+				.endif
+		.endif
+	
+	
+		mov al, enemyVelocity1
+		add enemy_x1, al
+		ret
+	moveEnemy1 endp
+
+
 
 
 	enemy proc
@@ -976,34 +1124,42 @@ include macro.inc
 	
 		push ax
 		push bx
+		push cx
+		push dx
+		push si
+		
 		mov ax,0
 		mov bx,0
 		mov bl,enemy_y1
 		mov al,enemy_x1
 	
 		;body
-	  	mPrintRectangle ax,bx, 20, 20, 85h 	,buffer_page	     ;ax 60 bx 60
+	  	mPrintRectangle ax,bx, 23, 23, 85h 	,buffer_page	     ;ax 60 bx 60
 		add ax,2
-		add bx,2
-		mPrintRectangle ax,bx, 15, 15,71h ,buffer_page			 ;ax 62 bx 62
+		sub bx,20
+		mPrintRectangle ax,bx, 18, 18,71h ,buffer_page			 ;ax 62 bx 62
 		add ax,3
-		add bx,3
-        mPrintRectangle ax,bx, 9, 9,66h ,buffer_page			 ;ax 65 bx 65
+		sub bx,15
+        mPrintRectangle ax,bx, 12, 12,66h ,buffer_page			 ;ax 65 bx 65
 		
 		;eyes
-		add ax,2
-		add bx,1
-		mPrintRectangle ax,bx, 2, 2,69h ,buffer_page			 ;ax 67 bx 66
 		add ax,3
+		sub bx,9
+		mPrintRectangle ax,bx, 2, 2,69h ,buffer_page			 ;ax 67 bx 66
+		add ax,4
+		sub bx,2
 		mPrintRectangle ax,bx, 2, 2,69h ,buffer_page			 ;ax 70 bx 66
 		
 		;hat
 		sub ax,5
-		sub bx,9
+		sub bx,14
         mPrintRectangle ax,bx, 9, 3, 15h 	,buffer_page		 ;ax 65 bx 57
 		add ax,2
-		sub bx,3
+		sub bx,6
 		mPrintRectangle ax,bx, 5, 3, 15h 	,buffer_page		 ;ax 67 bx 54
+		pop si 
+		pop dx
+		pop cx
 		pop bx
 		pop ax
 	
@@ -1013,6 +1169,85 @@ include macro.inc
 	
 	
 	
+	
+	;************************* BULLETS **************************************************************
+		
+	bulletfun2 proc
+	
+		push ax
+		push bx
+		
+		.if( bullet_y1 > 185 )
+			mov bullet_y1, 35
+		.endif
+		
+		mov al, enemy_x1
+		mov ah, bullet_y1
+		sub al, 5 ;Increase hitbox left on x axis
+		.if(  al <  mario_X   )
+		
+			add al, 25	;Increase hitbox RIGHT on xaxis
+			.if( mario_x < al   )
+			
+				sub ah, 5 ;Increase hitbox Up on yAxis
+				.if(  ah < mario_Y  )
+				
+					add ah, 25 ;Increase hitbox down on Yaxis
+					.if( mario_Y < ah  )
+					
+						dec lives
+						call reset
+					
+					.endif
+				
+				.endif
+			
+			
+			.endif
+		
+		
+		
+		.endif
+		
+		
+		
+		.if (bullet_Control > 0)
+			dec bullet_Control
+			jmp BulletJump
+		.else
+			mov bullet_Control, 5
+		.endif
+		
+		mov ax,0
+		mov bx,0
+		mov al,enemy_x1
+		mov bl,bullet_y1
+		
+		.if(bl>80)
+			sub al,1
+		
+			mPrintRectangle ax,bx, 8, 8, 29h ,buffer_page
+		
+		.elseif(bl<180)
+			add al,1
+			
+			mPrintRectangle ax,bx, 8, 8, 29h ,buffer_page
+		
+		
+		.endif
+	
+		mov bullet_y1,bl
+		
+	
+	BulletJump:	
+		pop bx
+		pop ax
+		
+		ret	
+	
+	bulletfun2 endp
+	
+
 	delay proc
 		push ax
 		push bx
@@ -1105,42 +1340,107 @@ include macro.inc
 	
 	
 	setPage proc
-	
+		push ax
 		mov ah, 05h
 		mov al, current_page
 		int 10h
+		pop ax
 		ret
 	setPage endp
+	
+	
+	kingdom proc
+	
+		push ax 
+		push bx 
+		;centre
+		mPrintRectangle 240, 130, 70, 60, 15h , buffer_page
+		;left wall
+		mPrintRectangle 240, 130, 25, 70, 15h , buffer_page
+		;right wall
+		mPrintRectangle 285, 130, 25, 70, 15h , buffer_page
+		;Blocks
+		;B1
+		mPrintRectangle 240, 120, 7, 75, 15h , buffer_page
+		;B3
+		mPrintRectangle 289, 120, 7, 75, 15h , buffer_page
+		;B2
+		mPrintRectangle 254, 120, 7, 75, 15h , buffer_page
+		mPrintRectangle 303, 120, 7, 75, 15h , buffer_page
+		;Pillars
+		mPrintRectangle 269, 90, 12, 40, 15h , buffer_page
+		;Top
+		mPrintRectangle 267, 90, 16, 5, 29h , buffer_page
+		mPrintRectangle 269, 86, 12, 5, 29h , buffer_page
+		mPrintRectangle 271, 82, 8, 5, 29h , buffer_page
+		mPrintRectangle 273, 78, 4, 5, 29h , buffer_page
+		;door
+		mPrintRectangle 265, 175, 20, 25, 62h , buffer_page
+		mPrintRectangle 267, 187, 4, 2, 11h , buffer_page
+		
+		
+		pop bx
+		pop ax
+		
+		
+		ret
+	kingdom endp
+	
+	
+	
+	PrintCloud proc
+	
+		
+		;right
+		mPrintRectangle 60,225, 15, 15, 0Eh	
+		mPrintRectangle 68,220, 15, 15, 0Eh	
+		mPrintRectangle 57,215, 15, 15, 0Eh	
+		
+		;center
+		mPrintRectangle 50,230, 15, 15, 0Eh	
+		mPrintRectangle 50,220, 15, 15, 0Eh	
+		mPrintRectangle 47,210, 15, 15, 0Eh	
+		
+		
+		;left
+		mPrintRectangle 40,225, 15, 15, 0Eh	
+		mPrintRectangle 30,220, 15, 15, 0Eh	
+		mPrintRectangle 37,215, 15, 15, 0Eh	
+		
+		;ExtremeLeft
+		mPrintRectangle 23,225, 10, 5, 0Eh	
+		
+		
+		;ExtremeRight
+		mPrintRectangle 75,225, 15, 5, 0Eh
+		
+		
+		ret
+	PrintCloud endp
+	
+	
 	
 
 	main proc
 		
 	BPF:	
-		mov cx, 2
-		mov ax,0
-		
-		;call jumper
 		
 		.if( jump_Maker == 0 )
 			call gravitaionalForce
 		.endif
-		
-		
-		back:
 
-			push cx
 			call clearScreen
-			call setPage
+			;call setPage
 			call jumper
-
-
+			
 
 			call readKeystroke
 			call marioGen
 
 			call printGameScreen
 			call switchPage
-
+			
+			
 			
 			call readKeystroke
 			call jumper
@@ -1150,20 +1450,23 @@ include macro.inc
 			call readKeystroke
 			call switchPage
 			
-			call collisionTrac
-		
-			pop cx
+			
 			
 			.if( current_Level == -50 )
 				jmp ex
 			.endif
 			
-		loop back	
+		
 	jmp BPF 
 		;^^^^^^^^^Starts an infinite loop. Uncomment this to see movement :D. 
 		
 		
 		ex:
+		
+		mov ah, 00
+		mov al, 03h
+		int 10h
+		
 		
 		
 	main endp
