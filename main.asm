@@ -485,6 +485,12 @@ include macro.inc
 	
 	jumper proc
 	
+		.if(mario_Y < 80)
+			mov jump_Maker, 0
+		
+		.endif
+		
+	
 		.if(jump_Maker > 0)
 			dec jump_Maker
 			sub mario_Y, 2
