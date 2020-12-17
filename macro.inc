@@ -1,5 +1,3 @@
-
-
 mTest macro
 	mov ax, 25
 endm
@@ -59,7 +57,6 @@ endm
 		push ax
 		push cx
 		push dx
-		push bx
 		;mov bh, page ;new
 		mov ah, 0ch	
 		mov al, color
@@ -67,7 +64,6 @@ endm
 		mov dx, row
 		int 10h
 		
-		pop bx
 		pop dx
 		pop cx
 		pop ax
@@ -77,7 +73,9 @@ endm
 
 	mDelay macro val
 	
-
+		local mydelay
+		local mydelay1
+	
 		push bx
 		push cx
 
