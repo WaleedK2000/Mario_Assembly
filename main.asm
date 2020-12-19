@@ -74,6 +74,8 @@ include macro.inc
 	scstr  db 'Score:100'
 	byeLose1 db 'Game Over!'
 	byeLose2 db 'Better Luck Next Time'
+	namestr db 6 dup('-')
+	prName db 'Enter Your Name'
 
 .code
 
@@ -584,6 +586,8 @@ include macro.inc
 		.if(current_Level == 0)
 		
 			call printTitleScreen
+		.elseif(current_Level == -1)
+			call nameEnterScreen
 		.elseif (current_Level == 1)
 		
 			call printLevelOne
@@ -618,6 +622,8 @@ include macro.inc
 		ret
 	
 	printGameScreen endp
+	
+
 	
 	printHurdles proc
 	
@@ -714,11 +720,11 @@ include macro.inc
 		; LEVEL 1 COMPLETE
 		mov si, offset strl2
 		mWriteStringAtPos 40,40, si, 9 , 45h, buffer_page 
-		
+		call switchPage
 		mdelay 1200	;Delay before starting Next Level
 		
 		mov current_Level, 2  ;Start Level 2
-
+		call switchPage
 		call reset
 		pop si
 		pop dx
@@ -796,10 +802,12 @@ include macro.inc
 		mov si, offset strl3
 		mWriteStringAtPos 40,39, si, 9 , 45h, buffer_page 
 		
+		call switchPage
+		
 		mdelay 1200	;Delay before starting Next Level
 		
 		mov current_Level, 3  ;Start Level 3
-
+		call switchPage
 		call reset
 		pop dx
 		pop cx
@@ -971,7 +979,7 @@ include macro.inc
 	
 		title_bye:
 		
-		mov current_level, 1
+		mov current_level, -1 ;Name enter Screen
 		
 		pop dx
 		pop cx
@@ -980,6 +988,62 @@ include macro.inc
 		
 		ret
 	printTitleScreen endp
+	
+	nameEnterScreen proc
+	
+		push ax
+		push bx
+		push cx
+		push dx
+		push si
+		push di
+	
+		mov current_page, 0
+		mov buffer_page, 0
+		call switchPage
+		
+		mPrintRectangle 0,0, 320, 320, 68H,buffer_page
+		mPrintRectangle 35,39, 240, 130, 36H,buffer_page
+		mPrintRectangle 55,56, 195, 90, 50H,buffer_page
+		
+		mov si, offset prName
+		mWriteStringAtPos 44,38, si, 15 , 39h, buffer_page
+		mov si, offset namestr
+		mWriteStringAtPos 48,39, si, 6 , 39h, buffer_page
+		mov cl, 0 ;counter
+		mov di, offset namestr
+		entry:
+		mov ah, 00
+		int 16h
+			mov si, offset namestr
+			mov [di], al
+			inc cl
+			inc di
+			push cx
+			mWriteStringAtPos 48,39, si, 6 , 39h, buffer_page
+			pop cx
+			cmp cl, 6
+			je GOOD
+			
+		jmp entry
+		
+		
+	Good:
+		mdelay 1000
+		call clearScreen
+		mov current_level, 1
+		mov buffer_page,0
+		mov current_page, 4
+		call switchPage
+		pop di
+		pop si
+		pop dx
+		pop cx
+		pop bx
+		pop ax
+			
+		ret
+	nameEnterScreen endp
 	
 	;This function will draw the flag
 	drawFlag proc
